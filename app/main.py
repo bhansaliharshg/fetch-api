@@ -41,9 +41,13 @@ THe below method refers to teh endpoint for getting the points.
 '''
 @app.get('/receipts/{id}/points', response_description='Get Points')
 async def get_points(id: str):
-    if id and id in receipts:
-        return {'points':receipts[id]['points']}
-    return {'points':0}
+    if id:
+        id = id.strip()
+        if id in receipts:
+            return {'points':receipts[id]['points']}
+        else:
+            return {'points': 0}
+    return {'error':'ID is empty.'}
 
 @app.get('/receipts/ids', response_description="Get all IDs")
 async def get_all_ids():
