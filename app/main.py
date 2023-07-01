@@ -77,6 +77,7 @@ The below method calculates the points based on the rule:
 '''
 def calculatePointsFromTotal(total):
     total = float(total)
+    points = 0
     points += 50 if total % 1 == 0 else 0
     points += 25 if total % 0.25 == 0 else 0
     return points
