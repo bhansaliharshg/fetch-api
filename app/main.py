@@ -6,8 +6,6 @@ import uuid
 import math
 from datetime import datetime as dt
 
-receipts = {}
-
 app = FastAPI()
 
 app.add_middleware(
@@ -18,10 +16,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+#Local receipts repository.
+receipts = {}
+
+'''
+Python Object for Item
+'''
 class Item(BaseModel):
     shortDescription: str
     price: str
 
+'''
+Python Object for Receipt
+'''
 class Receipt(BaseModel):
     retailer: str
     purchaseDate: str
@@ -30,35 +37,75 @@ class Receipt(BaseModel):
     items: list[Item] = []
 
 '''
-
+THe below method refers to teh endpoint for getting the points.
 '''
 @app.get('/receipts/{id}/points', response_description='Get Points')
-async def getPoints(id: str):
-    if id in receipts:
+async def get_points(id: str):
+    if id and id in receipts:
         return {'points':receipts[id]['points']}
     return {'points':0}
 
+@app.get('/receipts/ids', response_description="Get all IDs")
+async def get_all_ids():
+    ids = []
+    for key, value in receipts.items():
+        id = {'id': key, 'receipt': value['receipt'], 'points': value['points']}
+        ids.append(id)
+    return ids
+
 '''
+The below method is the endpoint for processing the receipt. It accepts receipt details in JSON format and calculates the points.
 '''
 @app.post('/receipts/process')
-async def processReceipts(receipt: Receipt):
-    print(receipt)
-    id = str(uuid.uuid4())
-    while True:
-        if len(receipts.keys()) > 0:
-            if id in receipts:
-                id = str(uuid.uuid4())
-                continue
+async def process_receipt(receipt: Receipt):
+    #Check if received receipt object is not empty
+    if receipt:
+        #Generate ID using uuid package
+        id = str(uuid.uuid4())
+
+        #Generate a new ID if duplicate ID generated.
+        while True:
+            if len(receipts.keys()) > 0:
+                if id in receipts:
+                    id = str(uuid.uuid4())
+                    continue
+                else: break
             else: break
-        else: break
-    points = 0
-    points += calculatePointsFromName(receipt.retailer)
-    points += calculatePointsFromTotal(receipt.total)
-    points += calculatePointsFromItems(receipt.items)
-    points += calculatePointsFromDate(receipt.purchaseDate)
-    points += calculatePointsFromTime(receipt.purchaseTime)
-    receipts[id] = {'receipt':receipt, 'points':points}
-    return {"id": id}
+        
+        #Logic to calculate points
+        points = 0
+
+        #Check for non emply retailer
+        if receipt.retailer:
+            #Calculate points for retailer name
+            points += calculatePointsFromName(receipt.retailer)
+        
+        #Check for non empty total
+        if receipt.total:
+            #Calculate points for total amount
+            points += calculatePointsFromTotal(receipt.total)
+        
+        #Check for non empty items
+        if receipt.items:
+            #Calculate points for purchased Items
+            points += calculatePointsFromItems(receipt.items)
+        
+        #Check for non empty Purchase Date
+        if receipt.purchaseDate:
+            #Calculate points for purchased date
+            points += calculatePointsFromDate(receipt.purchaseDate)
+        
+        #Check for non empty Purchase Time
+        if receipt.purchaseTime:
+            #Calculate points for purchased time
+            points += calculatePointsFromTime(receipt.purchaseTime)
+        
+        #Store receipt and calculated points in local repository(Dictionary)
+        receipts[id] = {'receipt':receipt, 'points':points}
+        return {"id": id}
+    else:
+        #Return error if receipt object is empty.
+        return {'error': 'Receipts body empty.'}
 
 '''
 The below method calculates the points based on the rule:
@@ -92,9 +139,7 @@ The below method calculates the points based on the rule:
 def calculatePointsFromItems(items:list[Item]):
     points = (len(items)//2)*5
     for item in items:
-        descLen = len(item.shortDescription.strip())
-        if descLen % 3 == 0:
-            points += math.ceil(float(item.price)*0.2)
+        points += math.ceil(float(item.price)*0.2) if len(item.shortDescription.strip()) % 3 == 0 else 0
     return points
 
 '''
@@ -111,9 +156,6 @@ The below method calculates the points based on the rule:
 def calculatePointsFromTime(time):
     time = dt.strptime(time, '%H:%M')
     return 10 if dt.strptime('16:00', '%H:%M') > time and time > dt.strptime('14:00', '%H:%M') else 0
-
-
-
 
 if __name__ == '__main__':
     uvicorn.run(app)
