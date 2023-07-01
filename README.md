@@ -2,15 +2,14 @@
 
 This is a Python-based API for processing receipts and calculating points based on specific rules. It provides several endpoints for interacting with the API.
 
-## Prerequisites
+## API - Hosted
+
+This api is hosted on Render. The endpoints can be accessed through the link: https://fecth-api.onrender.com/. As the API uses FastAPI library the enpoints can be tested using the link: https://fecth-api.onrender.com/docs. No local setup is required.
+
+## API - Local Setup - Prerequisites
 
 - Python 3.9 or above
 - Docker (optional)
-
-## API - Hosted
-
-The api is also hosted. The endpoints can be accessed through the link: https://fecth-api.onrender.com/
-As the API uses FastAPI library the enpoints can be tested using the link: https://fecth-api.onrender.com/docs. No local setup is required.
 
 ## Installation
 
