@@ -65,7 +65,7 @@ The below method calculates the points based on the rule:
     - One point for every alphanumeric character in the retailer name.
 '''
 def calculatePointsFromName(name):
-    points = []
+    points = 0
     for letter in name:
         points += 1 if letter.isalnum() else 0
     return points
