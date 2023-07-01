@@ -95,9 +95,3 @@ Alternatively, you can use Docker to build and run the API:
 
 The api is also hosted. The endpoints can be accessed through the link: https://fecth-api.onrender.com/
 As the API uses FastAPI library the enpoints can be tested using the link: https://fecth-api.onrender.com/docs. No local setup is required.
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
-
-Feel free to contribute and enhance the functionality of this API.
