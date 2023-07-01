@@ -87,11 +87,14 @@ Alternatively, you can use Docker to build and run the API:
 - **Example**:
   ```
   POST /receipts/process
-  Request Body: {"receipt": {"retailer": "Example Retailer", "purchaseDate": "2023-06-30", "purchaseTime": "15:30", "total": "20.50", "items": [{"shortDescription": "Item 1", "price
-
-": "10.00"}, {"shortDescription": "Item 2", "price": "5.25"}]}}
+  Request Body: {"retailer": "Example Retailer", "purchaseDate": "2023-06-30", "purchaseTime": "15:30", "total": "20.50", "items": [{"shortDescription": "Item 1", "price": "10.00"}, {"shortDescription": "Item 2", "price": "5.25"}]}
   Response: {"id": "12345"}
   ```
+
+## API - Hosted
+
+The api is also hosted. The endpoints can be accessed through the link: https://fecth-api.onrender.com/
+As the API uses FastAPI library the enpoints can be tested using the link: https://fecth-api.onrender.com/docs. No local setup is required.
 
 ## License
 
