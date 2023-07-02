@@ -23,7 +23,7 @@ To run the API locally, follow these steps:
    ```
 4. Start the API server using the following command:
    ```
-   uvicorn main:app --reload
+   python main.py
    ```
    The API will be accessible at http://localhost:8000.
 
