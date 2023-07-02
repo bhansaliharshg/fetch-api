@@ -1,17 +1,14 @@
 from datetime import datetime as dt
 from models import Item
-import math
+import math, re
 
 class Helper:
     '''
     The below method calculates the points based on the rule:
         - One point for every alphanumeric character in the retailer name.
-        '''
+    '''
     def calculatePointsFromName(self, name):
-        points = 0
-        for letter in name:
-            points += 1 if letter.isalnum() else 0
-        return points
+        return len(re.sub(r"\W+", "", name))
 
     '''
     The below method calculates the points based on the rule:
