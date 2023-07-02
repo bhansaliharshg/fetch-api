@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uuid
-import math
+import math, json
 from datetime import datetime as dt
 
 app = FastAPI()
@@ -65,13 +65,13 @@ async def process_receipt(receipt: Receipt):
     #Check if received receipt object is not empty
     if receipt:
         #Generate ID using uuid package
-        id = str(uuid.uuid3(uuid.NAMESPACE_DNS, receipt))
+        id = str(uuid.uuid3(uuid.NAMESPACE_DNS, str(receipt)))
 
         #Generate a new ID if duplicate ID generated.
         while True:
             if len(receipts.keys()) > 0:
                 if id in receipts:
-                    id = str(uuid.uuid3(uuid.NAMESPACE_DNS, receipt))
+                    id = str(uuid.uuid3(uuid.NAMESPACE_DNS, str(receipt)))
                     continue
                 else: break
             else: break
