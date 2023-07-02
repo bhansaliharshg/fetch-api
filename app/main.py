@@ -1,10 +1,9 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 import uuid
-import math, json
-from datetime import datetime as dt
+from models import Receipt
+from helper import Helper
 
 app = FastAPI()
 
@@ -19,22 +18,8 @@ app.add_middleware(
 #Local receipts repository.
 receipts = {}
 
-'''
-Python Object for Item
-'''
-class Item(BaseModel):
-    shortDescription: str
-    price: str
-
-'''
-Python Object for Receipt
-'''
-class Receipt(BaseModel):
-    retailer: str
-    purchaseDate: str
-    purchaseTime: str
-    total: str
-    items: list[Item] = []
+#Initialize Helper Function
+helper = Helper()
 
 '''
 THe below method refers to teh endpoint for getting the points.
@@ -82,27 +67,27 @@ async def process_receipt(receipt: Receipt):
         #Check for non emply retailer
         if receipt.retailer:
             #Calculate points for retailer name
-            points += calculatePointsFromName(receipt.retailer)
+            points += helper.calculatePointsFromName(receipt.retailer)
         
         #Check for non empty total
         if receipt.total:
             #Calculate points for total amount
-            points += calculatePointsFromTotal(receipt.total)
+            points += helper.calculatePointsFromTotal(receipt.total)
         
         #Check for non empty items
         if receipt.items:
             #Calculate points for purchased Items
-            points += calculatePointsFromItems(receipt.items)
+            points += helper.calculatePointsFromItems(receipt.items)
         
         #Check for non empty Purchase Date
         if receipt.purchaseDate:
             #Calculate points for purchased date
-            points += calculatePointsFromDate(receipt.purchaseDate)
+            points += helper.calculatePointsFromDate(receipt.purchaseDate)
         
         #Check for non empty Purchase Time
         if receipt.purchaseTime:
             #Calculate points for purchased time
-            points += calculatePointsFromTime(receipt.purchaseTime)
+            points += helper.calculatePointsFromTime(receipt.purchaseTime)
         
         #Store receipt and calculated points in local repository(Dictionary)
         receipts[id] = {'receipt':receipt, 'points':points}
@@ -110,56 +95,6 @@ async def process_receipt(receipt: Receipt):
     else:
         #Return error if receipt object is empty.
         return {'error': 'Receipts body empty.'}
-
-'''
-The below method calculates the points based on the rule:
-    - One point for every alphanumeric character in the retailer name.
-'''
-def calculatePointsFromName(name):
-    points = 0
-    for letter in name:
-        points += 1 if letter.isalnum() else 0
-    return points
-
-'''
-The below method calculates the points based on the rule:
-    - 50 points if the total is a round dollar amount with no cents.
-    - 25 points if the total is a multiple of 0.25.
-'''
-def calculatePointsFromTotal(total):
-    total = float(total)
-    points = 0
-    points += 50 if total % 1 == 0 else 0
-    points += 25 if total % 0.25 == 0 else 0
-    return points
-
-'''
-The below method calculates the points based on the rule:
-    - 5 points for every two items on the receipt.
-    - If the trimmed length of the item description is a multiple of 3, 
-    multiply the price by 0.2 and round up to the nearest integer.
-    The result is the number of points earned.
-'''
-def calculatePointsFromItems(items:list[Item]):
-    points = (len(items)//2)*5
-    for item in items:
-        points += math.ceil(float(item.price)*0.2) if len(item.shortDescription.strip()) % 3 == 0 else 0
-    return points
-
-'''
-The below method calculates the points based on the rule:
-    - 6 points if the day in the purchase date is odd.
-'''
-def calculatePointsFromDate(date):
-    return 6 if dt.strptime(date,'%Y-%m-%d').day % 2 == 1 else 0
-
-'''
-The below method calculates the points based on the rule:
-    - 10 points if the time of purchase is after 2:00pm and before 4:00pm.
-'''
-def calculatePointsFromTime(time):
-    time = dt.strptime(time, '%H:%M')
-    return 10 if dt.strptime('16:00', '%H:%M') > time and time > dt.strptime('14:00', '%H:%M') else 0
 
 if __name__ == '__main__':
     uvicorn.run(app)
