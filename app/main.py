@@ -18,7 +18,7 @@ app.add_middleware(
 #Local receipts repository.
 receipts = {}
 
-#Initialize Helper Function
+#Initialize Helper Class
 helper = Helper()
 
 '''
