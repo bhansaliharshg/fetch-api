@@ -65,13 +65,13 @@ async def process_receipt(receipt: Receipt):
     #Check if received receipt object is not empty
     if receipt:
         #Generate ID using uuid package
-        id = str(uuid.uuid3())
+        id = str(uuid.uuid3(uuid.NAMESPACE_DNS, receipt))
 
         #Generate a new ID if duplicate ID generated.
         while True:
             if len(receipts.keys()) > 0:
                 if id in receipts:
-                    id = str(uuid.uuid4())
+                    id = str(uuid.uuid3(uuid.NAMESPACE_DNS, receipt))
                     continue
                 else: break
             else: break
